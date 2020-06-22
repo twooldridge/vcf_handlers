@@ -8,7 +8,11 @@ import argparse
 import tempfile as tmp
 
 def process_vcf(vcf_path,sample_map,fraction_missing=None,maf=None):
-    file = gzip.open(vcf_path, 'rt')
+    if args.gzip:
+        opener = gzip.open
+    else:
+        opener = open
+    file = opener(vcf_path, 'rt')
     pops = set(sample_map.values())
     snp_pop_counts = []
     pop_counts = dict.fromkeys(pops)
