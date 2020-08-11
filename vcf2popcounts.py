@@ -8,10 +8,12 @@ import argparse
 import tempfile as tmp
 
 def process_vcf(vcf_path,sample_map,fraction_missing=None,maf=None):
-    if args.gzip:
+    if '.vcf.gz' in vcf_path:
         opener = gzip.open
-    else:
+    elif '.vcf' in vcf_path:
         opener = open
+    else:
+        print('file type not recognized')
     file = opener(vcf_path, 'rt')
     pops = set(sample_map.values())
     snp_pop_counts = []
@@ -117,16 +119,16 @@ flatten = lambda l: [item for sublist in l for item in sublist]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--gzvcf", help="input gzvcf;unzipped not supported yet, although should be an easy fix")
+    parser.add_argument("--vcf", help="input, searches or .vcf or .vcf.gz suffix")
     parser.add_argument("--map", help="popmap file -- this is a 2-column, tab separated file with sample names in the first column, and the corresponding population in the second")
-    parser.add_argument("--fraction_missing",help="fraction of genotypes that can be missing before a site is filtered out. 0 = no missing genotypes allowed")
+    parser.add_argument("--fraction_missing",help="fraction of genotypes that can be missing before a site is filtered out. 0 = no missing genotypes allowed, 1 = all missing genotypes allowed. Default is None")
     parser.add_argument("--maf",help="filter variants by minor allele frequency. Default = 0.025")
     parser.add_argument("--out", help="path to output file")
     
 
     # Parse arguments
     args = parser.parse_args()
-    vcf = args.gzvcf
+    vcf = args.vcf
     map_file = args.map
     missing_cutoff = args.fraction_missing
     maf = args.maf
